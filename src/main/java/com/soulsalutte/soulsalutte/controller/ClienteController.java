@@ -22,8 +22,26 @@ public class ClienteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Cliente>> listarClientes() {
-        List<Cliente> clientes = clienteService.listarTodos();
+    public ResponseEntity<List<Cliente>> listarClientes(@RequestParam(required = false) String nome) {
+        List<Cliente> clientes = clienteService.buscarClientes(nome);
         return ResponseEntity.ok(clientes);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Cliente> buscarClientePorId(@PathVariable Long id) {
+        Cliente cliente = clienteService.buscarClientePorId(id);
+        return ResponseEntity.ok(cliente);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Cliente> atualizarCliente(@PathVariable Long id, @RequestBody Cliente cliente) {
+        Cliente clienteAtualizado = clienteService.atualizarCliente(id, cliente);
+        return ResponseEntity.ok(clienteAtualizado);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarCliente(@PathVariable Long id) {
+        clienteService.deletarCliente(id);
+        return ResponseEntity.noContent().build();
     }
 }

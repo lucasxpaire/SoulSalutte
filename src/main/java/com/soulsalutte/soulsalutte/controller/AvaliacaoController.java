@@ -26,4 +26,16 @@ public class AvaliacaoController {
         List<Avaliacao> avaliacoes = avaliacaoService.listarAvaliacoesPorCliente(clienteId);
         return ResponseEntity.ok(avaliacoes);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Avaliacao> buscarAvaliacaoPorId(@PathVariable Long id) {
+        Avaliacao avaliacao = avaliacaoService.buscarPorId(id);
+        return ResponseEntity.ok(avaliacao);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Avaliacao> atualizarAvaliacao(@PathVariable Long id, @RequestBody Avaliacao avaliacao) {
+        Avaliacao avaliacaoAtualizada = avaliacaoService.atualizarAvaliacao(id, avaliacao);
+        return ResponseEntity.ok(avaliacaoAtualizada);
+    }
 }

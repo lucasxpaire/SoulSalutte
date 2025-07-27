@@ -34,4 +34,28 @@ public class Cliente {
     @CreationTimestamp
     @Column(name = "DATA_CADASTRO", nullable = false, updatable = false)
     private LocalDate dataCadastro;
+
+    @Column(name = "SEXO")
+    private String sexo;
+
+    @Column(name = "CIDADE")
+    private String cidade;
+
+    @Column(name = "BAIRRO")
+    private String bairro;
+
+    @Column(name = "PROFISSAO")
+    private String profissao;
+
+    @Column(name = "ENDERECO_RESIDENCIAL")
+    private String enderecoResidencial;
+
+    @Column(name = "ENDERECO_COMERCIAL")
+    private String enderecoComercial;
+
+    @Column(name = "NATURALIDADE")
+    private String naturalidade;
+
+    @Column(name = "ESTADO_CIVIL")
+    private String estadoCivil;
 }
