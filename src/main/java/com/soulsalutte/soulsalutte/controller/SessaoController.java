@@ -26,4 +26,10 @@ public class SessaoController {
         List<Sessao> sessoes = sessaoService.listarSessaoPorCliente(clienteId);
         return ResponseEntity.ok(sessoes);
     }
+
+    @GetMapping
+    public ResponseEntity<List<Sessao>> listarTodasAsSessoes() {
+        List<Sessao> sessoes = sessaoService.listarTodasAsSessoes();
+        return ResponseEntity.ok(sessoes);
+    }
 }

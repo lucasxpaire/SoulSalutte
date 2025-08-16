@@ -2,6 +2,7 @@ package com.soulsalutte.soulsalutte.service;
 
 import com.soulsalutte.soulsalutte.model.Cliente;
 import com.soulsalutte.soulsalutte.model.Sessao;
+import com.soulsalutte.soulsalutte.model.StatusSessao;
 import com.soulsalutte.soulsalutte.repository.ClienteRepository;
 import com.soulsalutte.soulsalutte.repository.SessaoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +17,15 @@ public class SessaoService {
     private SessaoRepository sessaoRepository;
 
     @Autowired
-    private ClienteRepository clienteService;
+    private ClienteRepository clienteRepository;
 
     public Sessao criarSessao(Long clienteId, Sessao sessao) {
-        Cliente cliente = clienteService.findById(clienteId)
+        Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado com ID: " + clienteId));
         sessao.setCliente(cliente);
+        if (sessao.getStatus() == null) {
+            sessao.setStatus(StatusSessao.AGENDADA);
+        }
         return sessaoRepository.save(sessao);
     }
 
@@ -29,4 +33,7 @@ public class SessaoService {
         return sessaoRepository.findByClienteId(clienteId);
     }
 
+    public List<Sessao> listarTodasAsSessoes() {
+        return sessaoRepository.findAll();
+    }
 }

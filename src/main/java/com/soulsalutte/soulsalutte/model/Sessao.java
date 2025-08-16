@@ -22,6 +22,9 @@ public class Sessao {
     @JoinColumn(name = "CLIENTE_ID", nullable = false)
     private Cliente cliente;
 
+    @Column(name = "NOME", nullable = false)
+    private String nome;
+
     @Column(name = "DATA_HORA_INICIO", nullable = false)
     private LocalDateTime dataHoraInicio;
 
