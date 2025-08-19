@@ -2,11 +2,14 @@ package com.soulsalutte.soulsalutte.service;
 
 import com.soulsalutte.soulsalutte.model.Avaliacao;
 import com.soulsalutte.soulsalutte.model.Cliente;
+import com.soulsalutte.soulsalutte.model.Evolucao;
 import com.soulsalutte.soulsalutte.repository.AvaliacaoRepository;
 import com.soulsalutte.soulsalutte.repository.ClienteRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,6 +25,14 @@ public class AvaliacaoService {
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado com ID: " + clienteId));
         avaliacao.setCliente(cliente);
+
+        if (avaliacao.getEvolucoes() != null) {
+            for (Evolucao evolucao : avaliacao.getEvolucoes()) {
+                evolucao.setId(null); // Garante que o JPA veja a evolução como uma nova entidade
+                evolucao.setAvaliacao(avaliacao); // Estabelece a relação bidirecional
+            }
+        }
+
         return avaliacaoRepository.save(avaliacao);
     }
 
@@ -80,8 +91,28 @@ public class AvaliacaoService {
         avaliacaoExistente.setObjetivosTratamento(avaliacaoAtualizada.getObjetivosTratamento());
         avaliacaoExistente.setRecursosTerapeuticos(avaliacaoAtualizada.getRecursosTerapeuticos());
         avaliacaoExistente.setPlanoTratamento(avaliacaoAtualizada.getPlanoTratamento());
-        avaliacaoExistente.setEvolucao(avaliacaoAtualizada.getEvolucao());
 
         return avaliacaoRepository.save(avaliacaoExistente);
+    }
+
+    @Transactional
+    public Avaliacao adicionarEvolucao(Long avaliacaoId, String textoEvolucao) {
+        Avaliacao avaliacao = buscarPorId(avaliacaoId);
+
+        Evolucao novaEvolucao = new Evolucao();
+        novaEvolucao.setEvolucao(textoEvolucao);
+        novaEvolucao.setDataEvolucao(LocalDateTime.now());
+        novaEvolucao.setAvaliacao(avaliacao);
+
+        avaliacao.getEvolucoes().add(novaEvolucao);
+
+        return avaliacaoRepository.save(avaliacao);
+    }
+
+    public void deletarAvaliacao(Long id) {
+        if (!avaliacaoRepository.existsById(id)) {
+            throw new RuntimeException("Avaliação não encontrada com ID: " + id);
+        }
+        avaliacaoRepository.deleteById(id);
     }
 }

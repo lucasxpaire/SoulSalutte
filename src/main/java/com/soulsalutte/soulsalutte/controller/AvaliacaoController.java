@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/avaliacoes")
@@ -37,5 +38,21 @@ public class AvaliacaoController {
     public ResponseEntity<Avaliacao> atualizarAvaliacao(@PathVariable Long id, @RequestBody Avaliacao avaliacao) {
         Avaliacao avaliacaoAtualizada = avaliacaoService.atualizarAvaliacao(id, avaliacao);
         return ResponseEntity.ok(avaliacaoAtualizada);
+    }
+
+    @PostMapping("/{id}/evolucoes")
+    public ResponseEntity<Avaliacao> adicionarEvolucao(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        String textoEvolucao = payload.get("evolucao");
+        if (textoEvolucao == null || textoEvolucao.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        Avaliacao avaliacaoAtualizada = avaliacaoService.adicionarEvolucao(id, textoEvolucao);
+        return ResponseEntity.ok(avaliacaoAtualizada);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarAvaliacao(@PathVariable Long id) {
+        avaliacaoService.deletarAvaliacao(id);
+        return ResponseEntity.noContent().build();
     }
 }

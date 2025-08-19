@@ -1,11 +1,16 @@
 package com.soulsalutte.soulsalutte.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -20,6 +25,7 @@ public class Avaliacao {
 
     @ManyToOne
     @JoinColumn(name = "CLIENTE_ID", nullable = false)
+    @JsonBackReference
     private Cliente cliente;
 
     @Column(name = "DATA_AVALIACAO", nullable = false)
@@ -134,7 +140,13 @@ public class Avaliacao {
     private String planoTratamento;
 
     // 4.4
-    @Lob
-    @Column(name = "EVOLUCAO")
-    private String evolucao;
+    @OneToMany(mappedBy = "avaliacao", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OrderBy("dataEvolucao DESC")
+    private List<Evolucao> evolucoes = new ArrayList<>();
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 }
