@@ -19,6 +19,9 @@ public class SessaoService {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @Autowired
+    private EmailService emailService;
+
     public Sessao criarSessao(Long clienteId, Sessao sessao) {
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado com ID: " + clienteId));
@@ -26,7 +29,12 @@ public class SessaoService {
         if (sessao.getStatus() == null) {
             sessao.setStatus(StatusSessao.AGENDADA);
         }
-        return sessaoRepository.save(sessao);
+        Sessao novaSessao = sessaoRepository.save(sessao);
+
+        if (novaSessao.isNotificacao()) {
+            emailService.enviarNotificacaoAgendamento(novaSessao);
+        }
+        return novaSessao;
     }
 
     public List<Sessao> listarSessaoPorCliente(Long clienteId) {

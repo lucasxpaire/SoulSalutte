@@ -38,4 +38,8 @@ public class Sessao {
     @Lob
     @Column(name = "NOTAS_SESSAO")
     private String notasSessao;
+
+    @Column(name = "NOTIFICACAO", nullable = false, columnDefinition = "boolean default true")
+    private boolean notificacao;
+
 }
