@@ -5,7 +5,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -16,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.util.Locale;
 
 @Service
@@ -36,12 +36,8 @@ public class EmailService {
             helper.setTo(sessao.getCliente().getEmail());
             helper.setSubject("✅ Confirmação de Agendamento - Soul Saluttē");
 
-            String conteudoIcs = gerarConteudoIcs(sessao);
-
             String corpoHtml = construirCorpoEmail(sessao);
             helper.setText(corpoHtml, true);
-
-            helper.addAttachment("invite.ics", new ByteArrayResource(conteudoIcs.getBytes(StandardCharsets.UTF_8)), "text/calendar");
 
             mailSender.send(message);
 
@@ -93,6 +89,9 @@ public class EmailService {
         String horaInicio = sessao.getDataHoraInicio().format(DateTimeFormatter.ofPattern("HH:mm"));
         String horaFim = sessao.getDataHoraFim().format(DateTimeFormatter.ofPattern("HH:mm"));
 
+        String conteudoIcs = gerarConteudoIcs(sessao);
+        String icsDataUri = "data:text/calendar;charset=utf-8;base64," + Base64.getEncoder().encodeToString(conteudoIcs.getBytes(StandardCharsets.UTF_8));
+
         ZoneId fusoHorarioBrasil = ZoneId.of("America/Sao_Paulo");
         ZonedDateTime inicioComFuso = sessao.getDataHoraInicio().atZone(fusoHorarioBrasil);
         ZonedDateTime fimComFuso = sessao.getDataHoraFim().atZone(fusoHorarioBrasil);
@@ -104,14 +103,7 @@ public class EmailService {
         String detalhesEvento = URLEncoder.encode("Sua sessão de fisioterapia com Lauren Pairé. Por favor, chegue com alguns minutos de antecedência.", StandardCharsets.UTF_8);
         String localizacao = URLEncoder.encode("Soul Saluttē - Centro de Saúde e Bem-Estar", StandardCharsets.UTF_8);
 
-        String googleCalendarUrl = String.format(
-                "https://www.google.com/calendar/render?action=TEMPLATE&text=%s&dates=%s/%s&details=%s&location=%s",
-                tituloEvento,
-                googleDataInicio,
-                googleDataFim,
-                detalhesEvento,
-                localizacao
-        );
+        String googleCalendarUrl = String.format("https://www.google.com/calendar/render?action=TEMPLATE&text=%s&dates=%s/%s&details=%s&location=%s", tituloEvento, googleDataInicio, googleDataFim, detalhesEvento, localizacao);
 
         return "<!DOCTYPE html>"
                 + "<html>"
@@ -138,10 +130,11 @@ public class EmailService {
                 + "        <p>🗓️ <strong>Data:</strong> " + dataSessao + "</p>"
                 + "        <p>⏰ <strong>Horário:</strong> " + horaInicio + " às " + horaFim + "</p>"
                 + "      </div>"
-                + "      <p>Para sua conveniência, enviamos um convite em anexo. <strong>Abra o anexo para adicionar o evento diretamente à agenda do seu celular ou computador.</strong></p>"
+                + "      <p>Clique no botão abaixo para adicionar o evento diretamente à sua agenda.</p>"
                 + "      <div class='button-container'>"
-                + "        <a href='" + googleCalendarUrl + "' class='calendar-button' target='_blank'>+ Adicionar à Agenda Google (Alternativa)</a>"
+                + "        <a href='" + icsDataUri + "' class='calendar-button' target='_blank'>+ Adicionar à Agenda</a>"
                 + "      </div>"
+                + "      <p style='font-size: 0.9em; color: #888;'>Usa o Google Agenda? <a href='" + googleCalendarUrl + "' target='_blank'>Clique aqui</a>.</p>"
                 + "      <p style='text-align: left; margin-top: 20px;'>Se precisar reagendar, entre em contato conosco.</p>"
                 + "      <p style='text-align: left;'>Atenciosamente,<br/>Equipe Soul Saluttē</p>"
                 + "    </div>"
