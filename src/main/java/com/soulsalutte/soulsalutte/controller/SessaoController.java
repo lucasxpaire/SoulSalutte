@@ -3,6 +3,8 @@ package com.soulsalutte.soulsalutte.controller;
 import com.soulsalutte.soulsalutte.model.Sessao;
 import com.soulsalutte.soulsalutte.service.SessaoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,4 +34,17 @@ public class SessaoController {
         List<Sessao> sessoes = sessaoService.listarTodasAsSessoes();
         return ResponseEntity.ok(sessoes);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Sessao> atualizarSessao(@PathVariable Long id, @RequestBody Sessao sessao) {
+        Sessao sessaoAtualizada = sessaoService.atualizarSessao(id, sessao);
+        return ResponseEntity.ok(sessaoAtualizada);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarSessao(@PathVariable Long id) {
+        sessaoService.deletarSessao(id);
+        return ResponseEntity.noContent().build();
+    }
+    
 }
