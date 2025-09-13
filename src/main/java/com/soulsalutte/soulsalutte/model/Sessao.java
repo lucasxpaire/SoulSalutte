@@ -42,4 +42,7 @@ public class Sessao {
     @Column(name = "NOTIFICACAO", nullable = false, columnDefinition = "boolean default true")
     private boolean notificacao;
 
+    @Column(name = "GOOGLE_CALENDAR_EVENT_ID")
+    private String googleCalendarEventId;
+
 }

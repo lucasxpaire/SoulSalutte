@@ -50,35 +50,71 @@ public class GoogleCalendarService {
                 .build();
     }
 
-    public void adicionarEvento(Sessao sessao) {
+    private Event sessaoToGoogleEvent(Sessao sessao) {
+        Event event = new Event()
+                .setSummary(sessao.getNome() + " - " + sessao.getCliente().getNome())
+                .setDescription("Notas da sessão: " + sessao.getNotasSessao())
+                .setLocation("Soul Saluttē - Centro de Saúde e Bem-Estar");
+
+        DateTime startDateTime = new DateTime(sessao.getDataHoraInicio().atZone(ZoneId.of("America/Sao_Paulo")).toInstant().toEpochMilli());
+        EventDateTime start = new EventDateTime()
+                .setDateTime(startDateTime)
+                .setTimeZone("America/Sao_Paulo");
+        event.setStart(start);
+
+        DateTime endDateTime = new DateTime(sessao.getDataHoraFim().atZone(ZoneId.of("America/Sao_Paulo")).toInstant().toEpochMilli());
+        EventDateTime end = new EventDateTime()
+                .setDateTime(endDateTime)
+                .setTimeZone("America/Sao_Paulo");
+        event.setEnd(end);
+
+        return event;
+    }
+
+    public String adicionarEvento(Sessao sessao) {
         try {
             Calendar service = getCalendarService();
+            Event event = sessaoToGoogleEvent(sessao);
 
-            Event event = new Event()
-                    .setSummary(sessao.getNome() + " - " + sessao.getCliente().getNome())
-                    .setDescription("Notas da sessão: " + sessao.getNotasSessao())
-                    .setLocation("Soul Saluttē - Centro de Saúde e Bem-Estar");
-
-            DateTime startDateTime = new DateTime(sessao.getDataHoraInicio().atZone(ZoneId.of("America/Sao_Paulo")).toInstant().toEpochMilli());
-            EventDateTime start = new EventDateTime()
-                    .setDateTime(startDateTime)
-                    .setTimeZone("America/Sao_Paulo");
-            event.setStart(start);
-
-            DateTime endDateTime = new DateTime(sessao.getDataHoraFim().atZone(ZoneId.of("America/Sao_Paulo")).toInstant().toEpochMilli());
-            EventDateTime end = new EventDateTime()
-                    .setDateTime(endDateTime)
-                    .setTimeZone("America/Sao_Paulo");
-            event.setEnd(end);
-
-            service.events().insert(calendarId, event)
-                    .setSendNotifications(true)
-                    .execute();
-
-            System.out.println("Evento criado com sucesso no Google Agenda.");
+            Event createdEvent = service.events().insert(calendarId, event).execute();
+            System.out.println("Evento criado com sucesso no Google Agenda: " + createdEvent.getHtmlLink());
+            return createdEvent.getId();
 
         } catch (Exception e) {
             System.err.println("Erro ao criar evento no Google Agenda: " + e.getMessage());
+            return null; // Retorna nulo em caso de falha
+        }
+    }
+
+    public void atualizarEvento(Sessao sessao) {
+        if (sessao.getGoogleCalendarEventId() == null) {
+            System.err.println("Não foi possível atualizar o evento no Google Agenda: ID do evento não encontrado.");
+            return;
+        }
+
+        try {
+            Calendar service = getCalendarService();
+            Event event = sessaoToGoogleEvent(sessao);
+
+            service.events().update(calendarId, sessao.getGoogleCalendarEventId(), event).execute();
+            System.out.println("Evento atualizado com sucesso no Google Agenda.");
+        } catch (Exception e) {
+            System.err.println("Erro ao atualizar evento no Google Agenda: " + e.getMessage());
+        }
+    }
+
+    public void deletarEvento(String eventId) {
+        if (eventId == null) {
+            System.err.println("Não foi possível deletar o evento no Google Agenda: ID do evento é nulo.");
+            return;
+        }
+
+        try {
+            Calendar service = getCalendarService();
+            service.events().delete(calendarId, eventId).execute();
+            System.out.println("Evento deletado com sucesso do Google Agenda.");
+        } catch (Exception e) {
+            System.err.println("Erro ao deletar evento no Google Agenda: " + e.getMessage());
         }
     }
 
