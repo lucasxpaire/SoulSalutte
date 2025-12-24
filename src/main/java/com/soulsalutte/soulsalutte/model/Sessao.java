@@ -1,5 +1,6 @@
 package com.soulsalutte.soulsalutte.model;
 
+import com.soulsalutte.soulsalutte.enums.StatusSessao;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,11 +39,5 @@ public class Sessao {
     @Lob
     @Column(name = "NOTAS_SESSAO")
     private String notasSessao;
-
-    @Column(name = "NOTIFICACAO", nullable = false, columnDefinition = "boolean default true")
-    private boolean notificacao;
-
-    @Column(name = "GOOGLE_CALENDAR_EVENT_ID")
-    private String googleCalendarEventId;
 
 }

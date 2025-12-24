@@ -1,4 +1,4 @@
-package com.soulsalutte.soulsalutte.model;
+package com.soulsalutte.soulsalutte.enums;
 
 public enum StatusSessao {
     AGENDADA,

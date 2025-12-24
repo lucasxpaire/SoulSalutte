@@ -1,6 +1,5 @@
 package com.soulsalutte.soulsalutte.service;
 
-import ch.qos.logback.core.net.server.Client;
 import com.soulsalutte.soulsalutte.model.Cliente;
 import com.soulsalutte.soulsalutte.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;

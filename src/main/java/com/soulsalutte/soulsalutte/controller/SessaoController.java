@@ -3,8 +3,6 @@ package com.soulsalutte.soulsalutte.controller;
 import com.soulsalutte.soulsalutte.model.Sessao;
 import com.soulsalutte.soulsalutte.service.SessaoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
